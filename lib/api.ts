@@ -1,3 +1,4 @@
+import { cacheLife } from "next/cache";
 import type { Category, Product } from "./types";
 
 const BASE_URLS = [
@@ -17,11 +18,12 @@ const FALLBACK_CATEGORIES: Category[] = [
   { id: "mosla", slug: "mosla", nameBn: "মসলা", icon: "🌶️" },
 ];
 
-async function apiFetch<T>(path: string): Promise<T> {
+/** Raw fetch with host fallback; prices change daily so 5-minute freshness is plenty */
+async function rawFetch<T>(path: string): Promise<T> {
   let lastError: unknown;
   for (const base of BASE_URLS) {
     try {
-      const res = await fetch(`${base}${path}`, { next: { revalidate: 300 } });
+      const res = await fetch(`${base}${path}`);
       if (!res.ok) throw new Error(`HTTP ${res.status} from ${base}`);
       return (await res.json()) as T;
     } catch (err) {
@@ -31,20 +33,30 @@ async function apiFetch<T>(path: string): Promise<T> {
   throw lastError instanceof Error ? lastError : new Error("API unreachable");
 }
 
-export function getCategories(): Promise<Category[]> {
-  return apiFetch<Category[]>("/categories");
+const PRICE_CACHE = { stale: 300, revalidate: 300, expire: 3600 };
+
+export async function getCategories(): Promise<Category[]> {
+  "use cache";
+  cacheLife(PRICE_CACHE);
+  return rawFetch<Category[]>("/categories");
 }
 
-export function getProducts(): Promise<Product[]> {
-  return apiFetch<Product[]>("/products");
+export async function getProducts(): Promise<Product[]> {
+  "use cache";
+  cacheLife(PRICE_CACHE);
+  return rawFetch<Product[]>("/products");
 }
 
-export function getProduct(slug: string): Promise<Product> {
-  return apiFetch<Product>(`/products/${slug}`);
+export async function getProduct(slug: string): Promise<Product> {
+  "use cache";
+  cacheLife(PRICE_CACHE);
+  return rawFetch<Product>(`/products/${slug}`);
 }
 
-export function getCategoryProducts(slug: string): Promise<Product[]> {
-  return apiFetch<Product[]>(`/products?category=${encodeURIComponent(slug)}`);
+export async function getCategoryProducts(slug: string): Promise<Product[]> {
+  "use cache";
+  cacheLife(PRICE_CACHE);
+  return rawFetch<Product[]>(`/products?category=${encodeURIComponent(slug)}`);
 }
 
 /** Never throws — falls back to the built-in category list */
