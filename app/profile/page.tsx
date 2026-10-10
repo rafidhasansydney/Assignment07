@@ -47,6 +47,15 @@ export default async function ProfilePage() {
         <h2 className="text-lg font-bold">তথ্য</h2>
         <div className="mt-4 space-y-4">
           <div>
+            <label className="block text-sm font-semibold">নাম</label>
+            <input
+              type="text"
+              value={name}
+              readOnly
+              className="mt-1 h-10 w-full cursor-not-allowed rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 text-sm text-[var(--muted)]"
+            />
+          </div>
+          <div>
             <label className="block text-sm font-semibold">ইমেইল</label>
             <input
               type="email"
