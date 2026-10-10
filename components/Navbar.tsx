@@ -5,8 +5,15 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Category } from "@/lib/types";
 import { bnDate } from "@/lib/bn";
+import UserMenu, { type SessionUser } from "./UserMenu";
 
-export default function Navbar({ categories }: { categories: Category[] }) {
+export default function Navbar({
+  categories,
+  user = null,
+}: {
+  categories: Category[];
+  user?: SessionUser;
+}) {
   const pathname = usePathname();
   // Read the clock only after mount — prerendering must not freeze a date
   const [date, setDate] = useState("");
@@ -25,20 +32,7 @@ export default function Navbar({ categories }: { categories: Category[] }) {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-2">
-          <Link
-            href="/signin"
-            className="flex h-10 items-center rounded-lg px-4 text-sm font-semibold text-[var(--foreground)] hover:bg-black/5"
-          >
-            সাইন ইন
-          </Link>
-          <Link
-            href="/signup"
-            className="flex h-10 items-center rounded-lg bg-[var(--primary)] px-4 text-sm font-semibold text-white hover:bg-[var(--primary-active)]"
-          >
-            সাইন আপ
-          </Link>
-        </nav>
+        <UserMenu user={user} />
       </div>
 
       <div className="border-t border-[var(--border)] bg-[var(--surface)]">

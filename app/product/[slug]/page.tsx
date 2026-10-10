@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { headers } from "next/headers";
 import type { Product } from "@/lib/types";
 import { getProducts, getProduct } from "@/lib/api";
 import { formatTaka, formatPct, perUnitBn, unitBn } from "@/lib/bn";
+import { auth } from "@/lib/auth";
 import ChangeBadge from "@/components/ChangeBadge";
 
 export async function generateStaticParams() {
@@ -40,6 +42,10 @@ export default async function ProductDetailsPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+
+  // protected route — product details are only for signed-in users
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect(`/signin?next=/product/${slug}`);
 
   let product: Product;
   try {
