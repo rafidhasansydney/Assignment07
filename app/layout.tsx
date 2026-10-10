@@ -33,7 +33,10 @@ export default async function RootLayout({
   ]);
 
   return (
-    <html lang="bn" className={`${hindSiliguri.variable} h-full antialiased`}>
+    <html
+      lang="bn"
+      className={`${hindSiliguri.variable} h-full scroll-smooth antialiased`}
+    >
       <body className="flex min-h-full flex-col">
         <Navbar categories={categories} />
         <Ticker products={tickerProducts} />
