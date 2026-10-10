@@ -47,10 +47,20 @@ export async function getProducts(): Promise<Product[]> {
   return rawFetch<Product[]>("/products");
 }
 
-export async function getProduct(slug: string): Promise<Product> {
+/**
+ * Resolved from the cached product list rather than /products/:slug —
+ * the list carries full market data, and it avoids one request per product
+ * during prerendering (the API rate-limits bursts with 429).
+ */
+export async function getProduct(slugOrId: string): Promise<Product> {
   "use cache";
   cacheLife(PRICE_CACHE);
-  return rawFetch<Product>(`/products/${slug}`);
+  const products = await rawFetch<Product[]>("/products");
+  const product = products.find(
+    (p) => p.slug === slugOrId || String(p.id) === slugOrId,
+  );
+  if (!product) throw new Error(`Product not found: ${slugOrId}`);
+  return product;
 }
 
 export async function getCategoryProducts(slug: string): Promise<Product[]> {
