@@ -7,7 +7,7 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <Link
       href={`/product/${product.slug}`}
-      className="block rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 transition-shadow hover:shadow-md"
+      className="block rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--primary)_40%,transparent)] hover:shadow-md active:translate-y-0"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
